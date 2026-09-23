@@ -12,7 +12,7 @@ A gestão manual de horários em barbearias por telefone ou mensagens frequentem
 ### Cliente
 * Autenticação simplificada por nome e telefone.
 * Visualização dos serviços disponíveis e profissionais da equipe.
-* Realização de agendamentos escolhendo serviço, barbeiro (ou sem preferência), data e horário disponível.
+* Realização de agendamentos escolhendo serviço, barbeiro, data e horário disponível.
 * Visualização e cancelamento dos próprios agendamentos.
 
 ### Administrador
@@ -27,7 +27,7 @@ A gestão manual de horários em barbearias por telefone ou mensagens frequentem
 * **Admin (Administrador):** Identificador (`id`) e senha criptografada (`password`).
 * **Barber (Barbeiro):** Identificador (`id`), nome (`name`), avatar (`avatarUrl`), especialidade (`specialty`), avaliação (`rating`), experiência (`experience`), tags (`tags`) e status ativo (`isActive`).
 * **BarberService (Serviço de Barbearia):** Identificador (`id`), nome (`name`), descrição (`description`), preço (`price`), duração em minutos (`durationMinutes`), ícone (`icon`) e status ativo (`isActive`).
-* **Appointment (Agendamento):** Identificador (`id`), cliente (`customerId`), barbeiro opcional (`barberId`), serviço (`barberServiceId`), data/hora agendada (`scheduledAt`), preço cobrado (`price`) e status (`status`: PENDING, CONFIRMED, COMPLETED, CANCELED).
+* **Appointment (Agendamento):** Identificador (`id`), cliente (`customerId`), barbeiro (`barberId`), serviço (`barberServiceId`), data/hora agendada (`scheduledAt`), preço cobrado (`price`) e status (`status`: PENDING, CONFIRMED, COMPLETED, CANCELED).
 
 ## 5. Justificativa da Solução (API + Aplicação Mobile)
 A solução requer uma API centralizada para sincronizar horários em tempo real, evitando agendamentos duplicados no mesmo intervalo e barbeiro, além de garantir o controle de permissões entre clientes e administradores. A aplicação mobile oferece aos clientes acesso rápido e prático para marcar e consultar horários a qualquer momento.
@@ -58,3 +58,10 @@ Com o banco em execução, aplique as migrações do Prisma:
 ```bash
 npm run prisma:migrate
 ```
+
+### 4. Popular o Banco (Seed)
+Cria o administrador e dados de exemplo (barbeiros, serviços, clientes e agendamentos). Pode ser executado mais de uma vez sem duplicar registros:
+```bash
+npm run prisma:seed
+```
+O login do administrador usa a senha definida em `ADMIN_PASSWORD` no `.env` (padrão `admin123`). O `npm run prisma:reset` também executa o seed automaticamente.
