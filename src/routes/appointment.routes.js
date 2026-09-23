@@ -7,11 +7,16 @@ import { validateRequest } from '../middlewares/validateRequest.js';
 import {
   appointmentIdParamSchema,
   listAppointmentsQuerySchema,
+  availableSlotsQuerySchema,
 } from '../schemas/appointment.read.schema.js';
 
 const router = Router();
 
-router.get('/available-slots', appointmentReadController.availableSlots);
+router.get(
+  '/available-slots',
+  validateRequest({ query: availableSlotsQuerySchema }),
+  appointmentReadController.availableSlots
+);
 router.get(
   '/',
   authenticate,

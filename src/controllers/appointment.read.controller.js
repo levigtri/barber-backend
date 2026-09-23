@@ -1,5 +1,5 @@
 import { prisma } from '../config/prisma.js';
-import { getDayRange } from '../config/slots.js';
+import { SLOTS, getDayRange, toLocalParts, toScheduledAt } from '../config/slots.js';
 import { appointmentInclude, serializeAppointment } from '../utils/serializers.js';
 
 export const appointmentReadController = {
@@ -52,7 +52,49 @@ export const appointmentReadController = {
     }
   },
 
-  async availableSlots(req, res) {
-    return res.status(501).json({ message: 'Não implementado' });
+  async availableSlots(req, res, next) {
+    try {
+      const { date, barberId, barberServiceId } = req.query;
+
+      const barber = await prisma.barber.findUnique({
+        where: { id: barberId },
+        select: { id: true, isActive: true },
+      });
+
+      if (!barber || !barber.isActive) {
+        return res.status(400).json({ message: 'Barbeiro inexistente ou inativo' });
+      }
+
+      const service = await prisma.barberService.findUnique({
+        where: { id: barberServiceId },
+        select: { id: true, isActive: true },
+      });
+
+      if (!service || !service.isActive) {
+        return res.status(400).json({ message: 'Serviço inexistente ou inativo' });
+      }
+
+      const { start, end } = getDayRange(date);
+
+      const taken = await prisma.appointment.findMany({
+        where: {
+          barberId,
+          scheduledAt: { gte: start, lt: end },
+          status: { not: 'CANCELED' },
+        },
+        select: { scheduledAt: true },
+      });
+
+      const takenTimes = new Set(taken.map((a) => toLocalParts(a.scheduledAt).time));
+
+      const now = new Date();
+      const availableSlots = SLOTS.filter(
+        (slot) => !takenTimes.has(slot) && toScheduledAt(date, slot) > now,
+      );
+
+      return res.json({ date, availableSlots });
+    } catch (error) {
+      return next(error);
+    }
   },
 };

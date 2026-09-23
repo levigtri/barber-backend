@@ -18,3 +18,11 @@ export const listAppointmentsQuerySchema = z
     date: z.iso.date({ message: 'date deve estar no formato AAAA-MM-DD' }).optional(),
   })
   .strict();
+
+export const availableSlotsQuerySchema = z
+  .object({
+    date: z.iso.date({ message: 'date deve estar no formato AAAA-MM-DD' }),
+    barberId: z.string().uuid({ message: 'barberId deve ser um UUID válido' }),
+    barberServiceId: z.string().uuid({ message: 'barberServiceId deve ser um UUID válido' }),
+  })
+  .strict();
