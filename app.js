@@ -2,6 +2,10 @@ import express from 'express';
 import { routes } from './src/routes/index.js';
 import { errorHandler } from './src/middlewares/errorHandler.js';
 
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET não definido no .env');
+}
+
 const app = express();
 const port = process.env.PORT || 3000;
 

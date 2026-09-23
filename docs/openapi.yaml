@@ -126,6 +126,8 @@ paths:
                   $ref: '#/components/schemas/CustomerWithStats'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /customers/{id}:
     get:
@@ -145,6 +147,10 @@ paths:
                 $ref: '#/components/schemas/CustomerWithStats'
         '404':
           $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   # ==========================================
   # BARBERS
@@ -195,6 +201,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /barbers/{id}:
     get:
@@ -238,6 +246,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
     delete:
       tags:
         - Barbers
@@ -254,6 +264,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   # ==========================================
   # BARBER SERVICES
@@ -263,7 +275,7 @@ paths:
       tags:
         - BarberServices
       summary: Listar serviços da barbearia
-      description: Retorna o catálogo de serviços oferecidos (ex.: Corte Tradicional, Barba, Pigmentação).
+      description: "Retorna o catálogo de serviços oferecidos (ex.: Corte Tradicional, Barba, Pigmentação)."
       parameters:
         - in: query
           name: activeOnly
@@ -304,6 +316,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /barber-services/{id}:
     get:
@@ -347,6 +361,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
     delete:
       tags:
         - BarberServices
@@ -363,6 +379,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   # ==========================================
   # APPOINTMENTS
@@ -416,7 +434,9 @@ paths:
       tags:
         - Appointments
       summary: Criar novo agendamento
-      description: Cria um agendamento com base no cliente, serviço, barbeiro (opcional) e horário selecionado.
+      description: >
+        Cria um agendamento para o cliente autenticado com o serviço, o barbeiro e o horário selecionados.
+        O cliente é identificado pelo token e o preço é copiado do serviço no momento da criação.
       security:
         - BearerAuth: []
       requestBody:
@@ -436,6 +456,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '409':
           description: Conflito de horário (horário indisponível para o barbeiro)
           content:
@@ -448,7 +470,7 @@ paths:
       tags:
         - Appointments
       summary: Consultar horários disponíveis
-      description: Retorna os intervalos de horários disponíveis em um determinado dia para um barbeiro (ou geral).
+      description: Retorna os horários livres de um barbeiro em um dia.
       parameters:
         - in: query
           name: date
@@ -459,6 +481,7 @@ paths:
           example: "2026-09-20"
         - in: query
           name: barberId
+          required: true
           schema:
             type: string
             format: uuid
@@ -485,6 +508,8 @@ paths:
                     items:
                       type: string
                       example: "09:00"
+        '400':
+          $ref: '#/components/responses/BadRequest'
 
   /appointments/{id}:
     get:
@@ -520,6 +545,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /appointments/{id}/status:
     patch:
@@ -555,6 +582,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
 components:
   securitySchemes:
@@ -582,6 +611,12 @@ components:
             $ref: '#/components/schemas/Error'
     Unauthorized:
       description: Não autorizado ou credenciais inválidas
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Usuário autenticado sem permissão para este recurso
       content:
         application/json:
           schema:
@@ -855,14 +890,10 @@ components:
     CreateAppointmentInput:
       type: object
       required:
-        - customerId
         - barberServiceId
+        - barberId
         - scheduledAt
       properties:
-        customerId:
-          type: string
-          format: uuid
-          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         barberServiceId:
           type: string
           format: uuid
@@ -870,13 +901,12 @@ components:
         barberId:
           type: string
           format: uuid
-          nullable: true
-          description: "Opcional. Se for nulo, representa 'Sem preferência'."
           example: "e2c31e6e-6c0b-4eb1-995a-0498b8fe66aa"
         scheduledAt:
           type: string
           format: date-time
-          example: "2026-09-30T15:30:00Z"
+          description: "Precisa ser um dos horários da lista de horários disponíveis"
+          example: "2026-09-30T15:30:00-03:00"
 
     Error:
       type: object
