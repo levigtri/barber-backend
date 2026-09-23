@@ -13,8 +13,12 @@ export function validateRequest({ body, params, query }) {
       }
       if (query) {
         const parsedQuery = await query.parseAsync(req.query);
-        Object.keys(req.query).forEach((key) => delete req.query[key]);
-        Object.assign(req.query, parsedQuery);
+        Object.defineProperty(req, 'query', {
+          value: parsedQuery,
+          writable: true,
+          configurable: true,
+          enumerable: true,
+        });
       }
       return next();
     } catch (error) {
