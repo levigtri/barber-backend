@@ -54,7 +54,22 @@ export const customerController = {
     }
   },
 
-  async getById(req, res) {
-    return res.status(501).json({ message: 'Não implementado' });
+  async getById(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const customer = await prisma.customer.findUnique({
+        where: { id },
+        include: statsInclude,
+      });
+
+      if (!customer) {
+        return res.status(404).json({ message: 'Cliente não encontrado' });
+      }
+
+      return res.json(toCustomerWithStats(customer));
+    } catch (error) {
+      return next(error);
+    }
   },
 };
