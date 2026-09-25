@@ -1,5 +1,18 @@
 # Sistema de Agendamento para Barbearia
 
+## Equipe
+
+| Nome | Matrícula |
+| --- | --- |
+| Ana Julia Chaves Souto da Costa | 569565 |
+| Levi Gomes Ferreira (turma da noite) | 556935 |
+| Luiz Henrique Nunes Sena | 568584 |
+| Pâmella Kyrla de Sousa Neco | 565637 |
+
+## Protótipo
+
+O protótipo das telas do aplicativo está no Figma: [Barbearia no Figma](https://www.figma.com/design/sZ0Ogv7Ed9cBTO50nCl3ep/Barbearia?node-id=76-55)
+
 ## 1. Problema ou Necessidade
 A gestão manual de horários em barbearias por telefone ou mensagens frequentemente causa conflitos de agenda, filas de espera e falta de autonomia para o cliente consultar horários e serviços disponíveis em tempo real. A aplicação busca centralizar e automatizar o processo de agendamento e gerenciamento do estabelecimento.
 
