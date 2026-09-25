@@ -9,6 +9,10 @@ import {
   listAppointmentsQuerySchema,
   availableSlotsQuerySchema,
 } from '../schemas/appointment.read.schema.js';
+import {
+  createAppointmentBodySchema,
+  updateAppointmentStatusBodySchema,
+} from '../schemas/appointment.write.schema.js';
 
 const router = Router();
 
@@ -23,14 +27,14 @@ router.get(
   validateRequest({ query: listAppointmentsQuerySchema }),
   appointmentReadController.list
 );
-router.post('/', authenticate, authorize('CUSTOMER'), appointmentWriteController.create);
+router.post('/', authenticate, authorize('CUSTOMER'), validateRequest({ body: createAppointmentBodySchema }), appointmentWriteController.create);
 router.get(
   '/:id',
   authenticate,
   validateRequest({ params: appointmentIdParamSchema }),
   appointmentReadController.getById
 );
-router.patch('/:id/status', authenticate, appointmentWriteController.updateStatus);
-router.delete('/:id', authenticate, authorize('ADMIN'), appointmentWriteController.remove);
+router.patch('/:id/status', authenticate, validateRequest({ params: appointmentIdParamSchema, body: updateAppointmentStatusBodySchema }), appointmentWriteController.updateStatus);
+router.delete('/:id', authenticate, authorize('ADMIN'), validateRequest({ params: appointmentIdParamSchema }), appointmentWriteController.remove);
 
 export const appointmentRoutes = router;
